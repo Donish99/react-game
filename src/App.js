@@ -10,6 +10,7 @@ const getRandXY = () => {
 };
 
 const initialState = {
+  interval: undefined,
   snakeFood: getRandXY(),
   snakeSpeed: 200,
   movementDirection: "r",
@@ -27,11 +28,13 @@ class App extends Component {
   state = initialState;
 
   componentDidMount() {
-    setInterval(this.moveSnake, this.state.snakeSpeed);
+    const interval = setInterval(this.moveSnake, this.state.snakeSpeed)
+    this.setState({interval});
     document.onkeydown = this.onKeyDown;
   }
 
   componentDidUpdate() {
+    console.log(this.state.interval, this.state.snakeSpeed)
     this.checkIfOutOfBorders();
     this.checkIfCollapsed();
     this.checkIfEatenSnakeFood();
@@ -39,6 +42,9 @@ class App extends Component {
 
   onKeyDown = (e) => {
     switch (e.keyCode) {
+      // case 27:
+      //   this.setState({movementDirection: "pause"});
+      //   break;
       case 38:
         if(this.state.movementDirection !== 'd') {
           this.setState({movementDirection: "u"});
@@ -68,6 +74,9 @@ class App extends Component {
     let dots = [...this.state.snakeBody];
     let head = dots[dots.length - 1];
     switch (this.state.movementDirection) {
+      // case "pause":
+      //     this.pause();
+      //   break;
       case "r":
           head = [head[0] + 2, head[1]];
         break;
@@ -111,6 +120,7 @@ class App extends Component {
   onGameOver() {
     alert(`Game Over. Snake length is ${this.state.snakeBody.length}`);
     this.setState(initialState);
+    this.manipulateInterval("end")
   }
 
   checkIfEatenSnakeFood() {
@@ -120,6 +130,7 @@ class App extends Component {
       this.setState({ snakeFood: getRandXY() });
       this.enlargeSnake();
       this.increaseSnakeSpeed();
+      this.manipulateInterval("food");
     }
   }
 
@@ -133,6 +144,18 @@ class App extends Component {
     const { snakeSpeed } = this.state;
     if (snakeSpeed > 10) {
       this.setState({ snakeSpeed: snakeSpeed - 10 });
+    }
+  }
+
+  manipulateInterval(action){
+    if(action === 'food'){
+      clearInterval(this.state.interval);
+      const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
+      this.setState({interval})
+    }else if(action === "end"){
+      clearInterval(this.state.interval);
+      const interval = setInterval(this.moveSnake, initialState.snakeSpeed);
+      this.setState({interval});
     }
   }
 
