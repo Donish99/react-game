@@ -10,7 +10,7 @@ const getRandXY = () => {
 };
 
 const initialState = {
-  sankeFood: getRandXY(),
+  snakeFood: getRandXY(),
   snakeSpeed: 200,
   movementDirection: "r",
   snakeBody: [
@@ -34,23 +34,30 @@ class App extends Component {
   componentDidUpdate() {
     this.checkIfOutOfBorders();
     this.checkIfCollapsed();
-    this.checkIfEatedsankeFood();
+    this.checkIfEatenSnakeFood();
   }
 
   onKeyDown = (e) => {
-    e = e || window.event;
     switch (e.keyCode) {
       case 38:
-        this.setState({ movementDirection: "u" });
+        if(this.state.movementDirection !== 'd') {
+          this.setState({movementDirection: "u"});
+        }
         break;
       case 40:
-        this.setState({ movementDirection: "d" });
+        if(this.state.movementDirection !== 'u') {
+          this.setState({movementDirection: "d"});
+        }
         break;
       case 37:
-        this.setState({ movementDirection: "l" });
+        if(this.state.movementDirection !== 'r') {
+          this.setState({movementDirection: "l"});
+        }
         break;
       case 39:
-        this.setState({ movementDirection: "r" });
+        if(this.state.movementDirection !== 'l') {
+          this.setState({movementDirection: "r"});
+        }
         break;
       default:
         break;
@@ -62,16 +69,16 @@ class App extends Component {
     let head = dots[dots.length - 1];
     switch (this.state.movementDirection) {
       case "r":
-        head = [head[0] + 2, head[1]];
+          head = [head[0] + 2, head[1]];
         break;
       case "u":
-        head = [head[0], head[1] - 2];
+          head = [head[0], head[1] - 2];
         break;
       case "l":
-        head = [head[0] - 2, head[1]];
+          head = [head[0] - 2, head[1]];
         break;
       case "d":
-        head = [head[0], head[1] + 2];
+          head = [head[0], head[1] + 2];
         break;
       default:
         break;
@@ -106,13 +113,13 @@ class App extends Component {
     this.setState(initialState);
   }
 
-  checkIfEatedsankeFood() {
+  checkIfEatenSnakeFood() {
     let head = this.state.snakeBody[this.state.snakeBody.length - 1];
-    const { sankeFood } = this.state;
-    if (head[0] === sankeFood[0] && head[1] === sankeFood[1]) {
-      this.setState({ sankeFood: getRandXY() });
+    const { snakeFood } = this.state;
+    if (head[0] === snakeFood[0] && head[1] === snakeFood[1]) {
+      this.setState({ snakeFood: getRandXY() });
       this.enlargeSnake();
-      this.increasesnakeSpeed();
+      this.increaseSnakeSpeed();
     }
   }
 
@@ -122,7 +129,7 @@ class App extends Component {
     this.setState({ snakeBody: snake });
   }
 
-  increasesnakeSpeed() {
+  increaseSnakeSpeed() {
     const { snakeSpeed } = this.state;
     if (snakeSpeed > 10) {
       this.setState({ snakeSpeed: snakeSpeed - 10 });
@@ -133,7 +140,7 @@ class App extends Component {
     return (
       <div className="game-area">
         <Snake snakeBody={this.state.snakeBody} />
-        <Food dot={this.state.sankeFood} />
+        <Food dot={this.state.snakeFood} />
       </div>
     );
   }
