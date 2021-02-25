@@ -10,9 +10,11 @@ const getRandXY = () => {
 };
 
 const initialState = {
+  pause: false,
   interval: undefined,
   snakeFood: getRandXY(),
   snakeSpeed: 200,
+  movementDirectionBeforePause: undefined,
   movementDirection: "r",
   snakeBody: [
     [0, 0],
@@ -34,7 +36,6 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    console.log(this.state.interval, this.state.snakeSpeed)
     this.checkIfOutOfBorders();
     this.checkIfCollapsed();
     this.checkIfEatenSnakeFood();
@@ -42,9 +43,9 @@ class App extends Component {
 
   onKeyDown = (e) => {
     switch (e.keyCode) {
-      // case 27:
-      //   this.setState({movementDirection: "pause"});
-      //   break;
+      case 27:
+        this.pauseClicked()
+        break;
       case 38:
         if(this.state.movementDirection !== 'd') {
           this.setState({movementDirection: "u"});
@@ -74,20 +75,17 @@ class App extends Component {
     let dots = [...this.state.snakeBody];
     let head = dots[dots.length - 1];
     switch (this.state.movementDirection) {
-      // case "pause":
-      //     this.pause();
-      //   break;
       case "r":
-          head = [head[0] + 2, head[1]];
+        head = [head[0] + 2, head[1]];
         break;
       case "u":
-          head = [head[0], head[1] - 2];
+        head = [head[0], head[1] - 2];
         break;
       case "l":
-          head = [head[0] - 2, head[1]];
+        head = [head[0] - 2, head[1]];
         break;
       case "d":
-          head = [head[0], head[1] + 2];
+        head = [head[0], head[1] + 2];
         break;
       default:
         break;
@@ -121,6 +119,16 @@ class App extends Component {
     alert(`Game Over. Snake length is ${this.state.snakeBody.length}`);
     this.setState(initialState);
     this.manipulateInterval("end")
+  }
+
+  pauseClicked() {
+    if(!this.state.pause){
+      clearInterval(this.state.interval)
+    } else{
+      let interval = setInterval(this.moveSnake, this.state.snakeSpeed)
+      this.setState({interval})
+    }
+    this.setState({pause: !this.state.pause})
   }
 
   checkIfEatenSnakeFood() {
