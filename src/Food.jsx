@@ -5,7 +5,7 @@ const Food = (props) => {
     left: `${props.dot[0]}%`,
     top: `${props.dot[1]}%`,
   };
-  return <div className="snake-food" style={style}></div>;
+  return <div className="snake-food" style={style}/>;
 };
 
 export default Food;
