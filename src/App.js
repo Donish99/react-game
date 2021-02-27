@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Snake from "./Snake";
 import Food from "./Food";
+import Pause from "./Pause";
+import GameOver from "./GameOver";
 
 
 const getRandXY = () => {
@@ -13,6 +15,7 @@ const getRandXY = () => {
 const initialState = {
   score: 0,
   highScore: 0,
+  gameOver: false,
   pause: false,
   interval: undefined,
   snakeFood: getRandXY(),
@@ -39,36 +42,43 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    this.checkIfOutOfBorders();
-    this.checkIfCollapsed();
-    this.checkIfEatenSnakeFood();
+    if(!this.state.gameOver){
+      this.checkIfOutOfBorders();
+      this.checkIfCollapsed();
+      this.checkIfEatenSnakeFood();
+    }
   }
 
   onKeyDown = (e) => {
     switch (e.keyCode) {
-      case 27:
+      case 32: //SPACE
+        if(this.state.gameOver){
+          this.startGame();
+        }
+        break;
+      case 27: //ESC
         this.pauseClicked()
         break;
-      case 38:
-      case 87:
+      case 38: //up arrow
+      case 87: // w - key
         if(this.state.movementDirection !== 'd') {
           this.setState({movementDirection: "u"});
         }
         break;
-      case 40:
-      case 83:
+      case 40: //down arrow
+      case 83: //s - key
         if(this.state.movementDirection !== 'u') {
           this.setState({movementDirection: "d"});
         }
         break;
-      case 37:
-      case 65:
+      case 37: //left arrow
+      case 65: //a - key
         if(this.state.movementDirection !== 'r') {
           this.setState({movementDirection: "l"});
         }
         break;
-      case 39:
-      case 68:
+      case 39: //right arrow
+      case 68: //d - key
         if(this.state.movementDirection !== 'l') {
           this.setState({movementDirection: "r"});
         }
@@ -123,11 +133,16 @@ class App extends Component {
   }
 
   onGameOver() {
+    clearInterval(this.state.interval);
+    this.setState({gameOver: true});
+  }
+
+  startGame(){
     const {highScore} = this.state;
-    alert(`Game Over. Snake length is ${this.state.snakeBody.length}`);
-    this.setState(initialState);
+    this.setState(initialState)
     this.setState({highScore})
-    this.manipulateInterval("end")
+    const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
+    this.setState({interval});
   }
 
   pauseClicked() {
@@ -148,7 +163,9 @@ class App extends Component {
       this.manipulateScore();
       this.enlargeSnake();
       this.increaseSnakeSpeed();
-      this.manipulateInterval("food");
+      clearInterval(this.state.interval);
+      const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
+      this.setState({interval})
     }
   }
 
@@ -174,27 +191,17 @@ class App extends Component {
     }
   }
 
-  manipulateInterval(action){
-    if(action === 'food'){
-      clearInterval(this.state.interval);
-      const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-      this.setState({interval})
-    }else if(action === "end"){
-      clearInterval(this.state.interval);
-      const interval = setInterval(this.moveSnake, initialState.snakeSpeed);
-      this.setState({interval});
-    }
-  }
-
   render() {
     return (
         <>
           <div className="game-area">
-            <Snake snakeBody={this.state.snakeBody} />
             <Food dot={this.state.snakeFood} />
+            <Snake snakeBody={this.state.snakeBody} />
+            {this.state.pause ? <Pause /> : null}
+            {this.state.gameOver ? <GameOver score={this.state.score}/> : null}
           </div>
           <div className="score-area">
-            <h1 className="score">High score: {this.state.highScore}</h1>
+            <h1 className="score">High score: {this.state.highScore}< /h1>
             <h1 className="score">Your score: {this.state.score}</h1>
           </div>
         </>

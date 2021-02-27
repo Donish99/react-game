@@ -1,6 +1,3 @@
-*{
-  background-color: #b582b0;
-}
 
 .game-area {
   position: relative;
@@ -27,7 +24,6 @@
   position: absolute;
   width: 2%;
   height: 2%;
-  /*border-radius: 50%;*/
   background-color: #ff0059;
   border: 1px solid #ff0059;
   z-index: 1;
@@ -37,18 +33,23 @@
   position: relative;
   margin: 50px auto;
   display: flex;
-  /*width: 600px;*/
-  /*height: 600px;*/
-  /*min-height: 500px;*/
-  /*min-width: 500px;*/
-  /*border: 15px solid black;*/
-  /*background-color: #6eda20;*/
   overflow: hidden;
   justify-content: center;
 }
 
 .score{
   margin: 20px;
-  border: 5px black solid;
+  border: 5px #ffffff solid;
+  background-color: black;
+  color: white;
   padding: 20px;
+}
+
+.game-area-info{
+  position: absolute;
+  top: 50%;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: 50px;
+  backdrop-filter: blur(2px);
 }
