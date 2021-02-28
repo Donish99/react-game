@@ -1,14 +1,17 @@
+*{
+  margin: 0;
+  padding: 0;
+}
 
 .game-area {
-  position: relative;
   margin: 50px auto;
+  position: relative;
   width: 600px;
   height: 600px;
   min-height: 500px;
   min-width: 500px;
-  border: 15px solid black;
-  background-color: #6eda20;
-  overflow: hidden;
+  border: 15px solid #9fadf9;
+    overflow: hidden;
 }
 
 .snake-dot {
@@ -31,7 +34,7 @@
 
 .score-area {
   position: relative;
-  margin: 50px auto;
+  margin: auto;
   display: flex;
   overflow: hidden;
   justify-content: center;
@@ -39,9 +42,7 @@
 
 .score{
   margin: 20px;
-  border: 5px #ffffff solid;
-  background-color: black;
-  color: white;
+  background-color: #3f51b580;
   padding: 20px;
 }
 
@@ -52,4 +53,11 @@
   margin-top: -50px;
   margin-left: 50px;
   backdrop-filter: blur(2px);
+}
+
+.options{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background-color: #3f51b580 ;
 }

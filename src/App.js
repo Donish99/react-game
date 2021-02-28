@@ -1,211 +1,114 @@
 import React, { Component } from "react";
-import Snake from "./Snake";
-import Food from "./Food";
-import Pause from "./Pause";
-import GameOver from "./GameOver";
-
-
-const getRandXY = () => {
-  let max = 98;
-  let x = Math.floor((Math.random() * max) / 2) * 2;
-  let y = Math.floor((Math.random() * max) / 2) * 2;
-  return [x, y];
-};
-
-const initialState = {
-  score: 0,
-  highScore: 0,
-  gameOver: false,
-  pause: false,
-  interval: undefined,
-  snakeFood: getRandXY(),
-  snakeSpeed: 200,
-  movementDirectionBeforePause: undefined,
-  movementDirection: "r",
-  snakeBody: [
-    [0, 0],
-    [2, 0],
-    [4, 0],
-    [6, 0],
-    [8, 0],
-    [10, 0],
-  ],
-};
+import Game from "./components/Game";
+import background from './background.mp3'
+import gameOverSound from './gameOver.wav';
+import foodEatSound from './eat.mp3';
 
 class App extends Component {
-  state = initialState;
-
-  componentDidMount() {
-    const interval = setInterval(this.moveSnake, this.state.snakeSpeed)
-    this.setState({interval});
-    document.onkeydown = this.onKeyDown;
+  state = {
+    display: false,
+    snakeColor: "#0350a0",
+    foodColor: "#ff0059",
+    gameAreaColor: "#6eda20",
+    gameSpeed: "default",
+    music: true,
+    effects: true,
   }
 
-  componentDidUpdate() {
-    if(!this.state.gameOver){
-      this.checkIfOutOfBorders();
-      this.checkIfCollapsed();
-      this.checkIfEatenSnakeFood();
+  music = new Audio(background);
+  gameOverSoundEffect = new Audio(gameOverSound);
+  foodEatSoundEffect = new Audio(foodEatSound);
+
+  handleOptionClick = () => {
+    this.setState({display: !this.state.display})
+  }
+
+  changeGameAreaColor(e){
+    this.setState({gameAreaColor: e.target.value});
+  }
+
+  changeSnakeColor(e){
+    this.setState({snakeColor: e.target.value})
+  }
+
+  changeFoodColor(e){
+    this.setState({foodColor: e.target.value})
+  }
+
+  changeGameSpeed(e){
+    const options = ["default", 200, 150, 100, 50]
+    this.setState({gameSpeed:options[e.target.value]})
+  }
+
+  handleMusic() {
+    if(this.state.music){
+      this.music.play()
+      this.music.addEventListener('ended', function () {
+        this.currentTime = 0;
+        this.play();
+      }, false);
+    }else{
+      this.music.pause();
+    }
+    this.setState({music: !this.state.music});
+  }
+
+  handleEffect(){
+    this.setState({effects: !this.state.effects});
+  }
+
+  gameOverSound = async() => {
+    if(this.state.effects){
+      if(this.state.music) await this.music.pause();
+      await this.gameOverSoundEffect.play()
+      await this.music.play()
     }
   }
 
-  onKeyDown = (e) => {
-    switch (e.keyCode) {
-      case 32: //SPACE
-        if(this.state.gameOver){
-          this.startGame();
-        }
-        break;
-      case 27: //ESC
-        this.pauseClicked()
-        break;
-      case 38: //up arrow
-      case 87: // w - key
-        if(this.state.movementDirection !== 'd') {
-          this.setState({movementDirection: "u"});
-        }
-        break;
-      case 40: //down arrow
-      case 83: //s - key
-        if(this.state.movementDirection !== 'u') {
-          this.setState({movementDirection: "d"});
-        }
-        break;
-      case 37: //left arrow
-      case 65: //a - key
-        if(this.state.movementDirection !== 'r') {
-          this.setState({movementDirection: "l"});
-        }
-        break;
-      case 39: //right arrow
-      case 68: //d - key
-        if(this.state.movementDirection !== 'l') {
-          this.setState({movementDirection: "r"});
-        }
-        break;
-      default:
-        break;
-    }
-  };
-
-  moveSnake = () => {
-    let dots = [...this.state.snakeBody];
-    let head = dots[dots.length - 1];
-    switch (this.state.movementDirection) {
-      case "r":
-        head = [head[0] + 2, head[1]];
-        break;
-      case "u":
-        head = [head[0], head[1] - 2];
-        break;
-      case "l":
-        head = [head[0] - 2, head[1]];
-        break;
-      case "d":
-        head = [head[0], head[1] + 2];
-        break;
-      default:
-        break;
-    }
-    dots.push(head);
-    dots.shift();
-    this.setState({
-      snakeBody: dots,
-    });
-  };
-
-  checkIfOutOfBorders() {
-    let head = this.state.snakeBody[this.state.snakeBody.length - 1];
-    if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
-      this.onGameOver();
-    }
-  }
-
-  checkIfCollapsed() {
-    let snake = [...this.state.snakeBody];
-    let head = snake[snake.length - 1];
-    snake.pop();
-    snake.forEach((dot) => {
-      if (head[0] === dot[0] && head[1] === dot[1]) {
-        this.onGameOver();
-      }
-    });
-  }
-
-  onGameOver() {
-    clearInterval(this.state.interval);
-    this.setState({gameOver: true});
-  }
-
-  startGame(){
-    const {highScore} = this.state;
-    this.setState(initialState)
-    this.setState({highScore})
-    const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-    this.setState({interval});
-  }
-
-  pauseClicked() {
-    if(!this.state.pause){
-      clearInterval(this.state.interval)
-    } else{
-      let interval = setInterval(this.moveSnake, this.state.snakeSpeed)
-      this.setState({interval})
-    }
-    this.setState({pause: !this.state.pause})
-  }
-
-  checkIfEatenSnakeFood() {
-    let head = this.state.snakeBody[this.state.snakeBody.length - 1];
-    const { snakeFood } = this.state;
-    if (head[0] === snakeFood[0] && head[1] === snakeFood[1]) {
-      this.setState({ snakeFood: getRandXY() });
-      this.manipulateScore();
-      this.enlargeSnake();
-      this.increaseSnakeSpeed();
-      clearInterval(this.state.interval);
-      const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-      this.setState({interval})
-    }
-  }
-
-  manipulateScore(){
-    let {score, highScore} = this.state
-    score += 1;
-    if(score > highScore){
-      highScore = score;
-    }
-    this.setState({score, highScore})
-  }
-
-  enlargeSnake() {
-    const snake = [...this.state.snakeBody];
-    snake.unshift([]);
-    this.setState({ snakeBody: snake });
-  }
-
-  increaseSnakeSpeed() {
-    const { snakeSpeed } = this.state;
-    if (snakeSpeed > 50) {
-      this.setState({ snakeSpeed: snakeSpeed - 10 });
+  foodEatSound = async () => {
+    if(this.state.effects){
+      if(this.state.music) await this.music.pause();
+      await this.foodEatSoundEffect.play()
+      await this.music.play();
     }
   }
 
   render() {
+    const {snakeColor, foodColor, gameAreaColor, gameSpeed} = this.state
     return (
         <>
-          <div className="game-area">
-            <Food dot={this.state.snakeFood} />
-            <Snake snakeBody={this.state.snakeBody} />
-            {this.state.pause ? <Pause /> : null}
-            {this.state.gameOver ? <GameOver score={this.state.score}/> : null}
-          </div>
-          <div className="score-area">
-            <h1 className="score">High score: {this.state.highScore}< /h1>
-            <h1 className="score">Your score: {this.state.score}</h1>
+          <Game
+              foodEatSound={this.foodEatSound}
+              gameOverSound={this.gameOverSound}
+              pause={this.state.display}
+              snakeColor={snakeColor}
+              foodColor={foodColor}
+              gameAreaColor={gameAreaColor}
+              gameSpeed={gameSpeed}
+              handleOptionClick={this.handleOptionClick}
+          />
+          <div className="options-container" style={this.state.display ? {display: "block"} : {display:"none"}}>
+            <div className="options" >
+              <label htmlFor="snake">Color of snake</label>
+              <input id="snake" type="color" value={this.state.snakeColor} onChange={ e => this.changeSnakeColor(e)}/>
+              <label htmlFor="food">Color of food</label>
+              <input id="food" type="color" value={this.state.foodColor} onChange={ e => this.changeFoodColor(e)}/>
+              <label htmlFor="area">Color of area</label>
+              <input id="area" type="color" value={this.state.gameAreaColor } onChange={ e => this.changeGameAreaColor(e)}/>
+              <label htmlFor="speed">Game speed:</label>
+              <select id="speed" name="Game speed" onChange={e => this.changeGameSpeed(e)}>
+                <option value="0">default</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+              <button onClick={() => this.handleMusic()}>music</button>
+              <button onClick={() => this.handleEffect()}>effect</button>
+            </div>
           </div>
         </>
-    );
+    )
   }
 }
 
