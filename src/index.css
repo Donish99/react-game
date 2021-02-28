@@ -1,17 +1,17 @@
-*{
+* {
   margin: 0;
   padding: 0;
 }
 
 .game-area {
-  margin: 50px auto;
+  margin: auto;
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: 500px;
+  height: 500px;
   min-height: 500px;
   min-width: 500px;
   border: 15px solid #9fadf9;
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .snake-dot {
@@ -32,32 +32,38 @@
   z-index: 1;
 }
 
+.game-area-info {
+  z-index: 3;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(2px);
+}
+
 .score-area {
   position: relative;
-  margin: auto;
   display: flex;
   overflow: hidden;
   justify-content: center;
 }
 
-.score{
-  margin: 20px;
+.score {
+  margin: 5px;
   background-color: #3f51b580;
-  padding: 20px;
+  padding: 10px;
 }
 
-.game-area-info{
-  position: absolute;
-  top: 50%;
-  height: 100px;
-  margin-top: -50px;
-  margin-left: 50px;
-  backdrop-filter: blur(2px);
-}
-
-.options{
-  display: flex;
+.options {
+  justify-items: center;
+  align-items: center;
   justify-content: center;
   width: 100%;
-  background-color: #3f51b580 ;
+  /* background-color: #3f51b580; */
+  bottom: 0;
+}
+
+label {
+  justify-self: flex-end;
 }

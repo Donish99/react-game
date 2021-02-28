@@ -1,6 +1,6 @@
 import React from "react";
 
-const Snake = ({snakeBody, snakeColor}) => {
+const Snake = ({ snakeBody, snakeColor }) => {
   return (
     <div>
       {snakeBody.map((dot, i) => {
@@ -8,9 +8,9 @@ const Snake = ({snakeBody, snakeColor}) => {
           left: `${dot[0]}%`,
           top: `${dot[1]}%`,
           backgroundColor: snakeColor,
-          borderColor: snakeColor
+          borderColor: snakeColor,
         };
-        return <div className="snake-dot" key={i} style={style}/>;
+        return <div className="snake-dot" key={i} style={style} />;
       })}
     </div>
   );
