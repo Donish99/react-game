@@ -8,13 +8,14 @@ import Statistics from "./Statistics";
 
 class Game extends Component{
     state = {
+        gameOver: false,
         display: false,
         snakeColor: "#0350a0",
         foodColor: "#ff0059",
         gameAreaColor: "#6eda20",
         gameSpeed: "default",
         isMusic: false,
-        isEffects: true,
+        isEffects: false,
         music: new Audio(background),
         gameOverSoundEffect: new Audio(gameOverSound),
         foodEatSoundEffect: new Audio(foodEatSound),
@@ -35,6 +36,10 @@ class Game extends Component{
             default:
                 break;
         }
+    }
+
+    handleGameOver = () => {
+        this.setState({gameOver: !this.state.gameOver});
     }
 
     handleOptionClick = () => {
@@ -133,6 +138,7 @@ class Game extends Component{
                     </div>
                     <div className="col-8 mr-5">
                         <GameArea
+                            handleGameOver={this.handleGameOver}
                             foodEatSound={this.foodEatSound}
                             gameOverSound={this.gameOverSound}
                             handleGameStartMusic={this.handleGameStartMusic}
@@ -145,7 +151,7 @@ class Game extends Component{
                         />
                     </div>
                     <div className="col">
-                        <Statistics/>
+                        <Statistics gameOver={this.state.gameOver}/>
                     </div>
                 </div>
             </div>

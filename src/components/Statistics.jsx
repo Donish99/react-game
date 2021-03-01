@@ -1,13 +1,26 @@
 import React, {useEffect, useState} from "react";
 
-const Statistics = () =>{
-    let data = localStorage.getItem('scoreBoard') || [];
-    console.log(data)
-
+const Statistics = (props) =>{
+    const [data, setData] = useState([]);
     const handleResetStats = () => {
-        localStorage.removeItem('highestScore');
         localStorage.removeItem('scoreBoard');
+        setData([])
     }
+
+    useEffect(() => {
+        let tmp;
+        let ls = localStorage.getItem('scoreBoard');
+        if(ls !== null){
+            ls = ls.split(',')
+            if(ls.length >= 10) {
+                while(ls.length  !== 10){
+                    ls.shift()
+                }
+            }
+            setData(ls)
+            localStorage.setItem('scoreBoard', ls.toString())
+        }
+    }, [props.gameOver])
 
     return (
         <>
@@ -20,15 +33,15 @@ const Statistics = () =>{
                     </tr>
                 </thead>
                 <tbody>
-                {/*{data.map((el, index) => {*/}
+                {data.map((el, index) => {
 
-                {/*    return el !== "null" ?*/}
-                {/*        (<tr key={index}>*/}
-                {/*            <td>{index}</td>*/}
-                {/*            <td>{el}</td>*/}
-                {/*        </tr>)*/}
-                {/*    : null*/}
-                {/*})}*/}
+                    return el !== "null" ?
+                        (<tr key={index}>
+                            <td>{index}</td>
+                            <td>{el}</td>
+                        </tr>)
+                    : null
+                })}
                 </tbody>
             </table>
     </>

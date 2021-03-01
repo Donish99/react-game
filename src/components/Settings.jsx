@@ -31,7 +31,7 @@ const Settings = (props) => {
         >
           music
         </button>
-        <input type="range" min="0" max="1" step={0.1} id="vol-control" onChange={e => changeMusicVolume(e)}/>
+        <input type="range" min="0" max="1" step={0.1} id="vol-control" className={"form-control-range"} onChange={e => changeMusicVolume(e)}/>
         <button
           id="effects"
           className={`btn btn-${effects ? "primary" : "secondary"} btn-sm`}
@@ -39,7 +39,7 @@ const Settings = (props) => {
         >
           sounds
         </button>
-        <input type="range" min="0" max="1" step={0.1} id="vol-control" onChange={e => changeEffectsVolume(e)}/>
+        <input type="range" min="0" max="1" step={0.1} id="vol-control" className={"form-control-range"} onChange={e => changeEffectsVolume(e)}/>
         <label className="input-group-text" htmlFor="snake">
           Color of snake
         </label>
@@ -72,18 +72,18 @@ const Settings = (props) => {
         />
         <div className="input-group mb-3">
           <label className="input-group-text" htmlFor="speed">
-            GameArea speed:
+            Difficulty:
           </label>
           <select
             id="speed"
             name="Game speed"
             onChange={(e) => changeGameSpeed(e)}
           >
-            <option value="0">default</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
+            <option value="default">default</option>
+            <option value="1">easy</option>
+            <option value="2">medium</option>
+            <option value="3">hard</option>
+            <option value="4">expert</option>
           </select>
         </div>
       </div>

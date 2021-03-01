@@ -151,6 +151,7 @@ class GameArea extends Component {
   }
 
   onGameOver() {
+    this.props.handleGameOver();
     this.handleStorage();
     this.props.gameOverSound();
     clearInterval(this.state.interval);
@@ -158,10 +159,9 @@ class GameArea extends Component {
   }
 
   startGame() {
-    // const { highScore } = this.state;
+    const { highScore } = this.state;
     this.setState(initialState);
-    console.log(initialState.highScore)
-    // this.setState({ highScore });
+    this.setState({ highScore });
     const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
     this.setState({ interval });
     this.props.handleGameStartMusic();
