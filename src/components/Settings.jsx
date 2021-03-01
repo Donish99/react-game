@@ -14,6 +14,8 @@ const Settings = (props) => {
     changeFoodColor,
     changeGameAreaColor,
     changeGameSpeed,
+    changeMusicVolume,
+    changeEffectsVolume
   } = props;
   const { handleEffect, handleMusic } = props;
   return (
@@ -29,13 +31,15 @@ const Settings = (props) => {
         >
           music
         </button>
+        <input type="range" min="0" max="1" step={0.1} id="vol-control" onChange={e => changeMusicVolume(e)}/>
         <button
           id="effects"
-          className={`btn btn-${effects ? "primary" : "secondary"} btn-sm m-2`}
+          className={`btn btn-${effects ? "primary" : "secondary"} btn-sm`}
           onClick={() => handleEffect()}
         >
-          effect
+          sounds
         </button>
+        <input type="range" min="0" max="1" step={0.1} id="vol-control" onChange={e => changeEffectsVolume(e)}/>
         <label className="input-group-text" htmlFor="snake">
           Color of snake
         </label>
@@ -68,7 +72,7 @@ const Settings = (props) => {
         />
         <div className="input-group mb-3">
           <label className="input-group-text" htmlFor="speed">
-            Game speed:
+            GameArea speed:
           </label>
           <select
             id="speed"

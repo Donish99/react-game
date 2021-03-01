@@ -1,234 +1,156 @@
-import React, { Component } from "react";
-import Food from "./GameComponents/Food";
-import Snake from "./GameComponents/Snake";
-import Pause from "./GameComponents/Pause";
-import GameOver from "./GameComponents/GameOver";
+import React, {Component} from "react";
+import GameArea from "./GameArea";
+import Settings from "./Settings";
+import background from "../sounds/background.mp3";
+import gameOverSound from "../sounds/gameOver.wav";
+import foodEatSound from "../sounds/eat.mp3";
+import Statistics from "./Statistics";
 
-const getRandXY = () => {
-  let max = 98;
-  let x = Math.floor((Math.random() * max) / 2) * 2;
-  let y = Math.floor((Math.random() * max) / 2) * 2;
-  return [x, y];
-};
+class Game extends Component{
+    state = {
+        display: false,
+        snakeColor: "#0350a0",
+        foodColor: "#ff0059",
+        gameAreaColor: "#6eda20",
+        gameSpeed: "default",
+        isMusic: false,
+        isEffects: true,
+        music: new Audio(background),
+        gameOverSoundEffect: new Audio(gameOverSound),
+        foodEatSoundEffect: new Audio(foodEatSound),
+    };
 
-const initialState = {
-  score: 0,
-  highScore: 0,
-  gameOver: false,
-  pause: false,
-  interval: undefined,
-  snakeFood: getRandXY(),
-  snakeSpeed: 200,
-  movementDirectionBeforePause: undefined,
-  movementDirection: "r",
-  snakeBody: [
-    [0, 0],
-    [2, 0],
-    [4, 0],
-    [6, 0],
-    [8, 0],
-    [10, 0],
-  ],
-};
-
-class Game extends Component {
-  constructor(props) {
-    super(props);
-  }
-  state = initialState;
-
-  componentDidMount() {
-    const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-    this.setState({ interval });
-    document.onkeydown = this.onKeyDown;
-  }
-
-  componentDidUpdate(previous) {
-    if (
-      this.props.gameSpeed !== "default" &&
-      this.props.gameSpeed !== this.state.snakeSpeed
-    ) {
-      this.setState({ snakeSpeed: this.props.gameSpeed });
-    } else if (
-      this.props.gameSpeed === "default" &&
-      this.state.snakeSpeed !== 200 &&
-      previous.gameSpeed !== "default"
-    ) {
-      console.log(previous);
-      this.setState({ snakeSpeed: 200 });
+    componentDidMount() {
+        document.onkeypress = this.hotKeys;
     }
-    if (!this.state.gameOver) {
-      this.checkIfOutOfBorders();
-      this.checkIfCollapsed();
-      this.checkIfEatenSnakeFood();
-    }
-  }
 
-  onKeyDown = (e) => {
-    switch (e.keyCode) {
-      case 32: //SPACE
-        if (this.state.gameOver) {
-          this.startGame();
+    hotKeys = (e) => {
+        switch (e.keyCode){
+            case 112: // P
+                this.handleMusic()
+                break;
+            case 111: // P
+                this.handleEffect()
+                break;
+            default:
+                break;
         }
-        break;
-      case 27: //ESC
-        if (!this.state.gameOver) {
-          this.pauseClicked();
-          this.props.handleOptionClick();
+    }
+
+    handleOptionClick = () => {
+        this.setState({ display: !this.state.display });
+    };
+
+    changeGameAreaColor = (e) => {
+        this.setState({ gameAreaColor: e.target.value });
+    };
+
+    changeSnakeColor = (e) => {
+        this.setState({ snakeColor: e.target.value });
+    };
+
+    changeFoodColor = (e) => {
+        this.setState({ foodColor: e.target.value });
+    };
+
+    changeGameSpeed = (e) => {
+        const options = ["default", 200, 150, 100, 50];
+        this.setState({ gameSpeed: options[e.target.value] });
+    };
+
+    changeMusicVolume = (e) => {
+        this.state.music.volume = e.target.value;
+    }
+
+    changeEffectsVolume = (e) => {
+        this.state.foodEatSoundEffect.volume = e.target.value
+        this.state.gameOverSoundEffect.volume = e.target.value
+    }
+
+    handleMusic = () => {
+        if (!this.state.isMusic) {
+            this.state.music.play();
+            this.state.music.addEventListener(
+                "ended",
+                function () {
+                    this.currentTime = 0;
+                    this.play();
+                },
+                false
+            );
+        } else {
+            this.state.music.pause();
         }
-        break;
-      case 38: //up arrow
-      case 87: // w - key
-        if (this.state.movementDirection !== "d") {
-          this.setState({ movementDirection: "u" });
+        this.setState({ isMusic: !this.state.isMusic });
+    };
+
+    handleEffect = () => {
+        this.setState({ isEffects: !this.state.isEffects });
+    };
+
+    gameOverSound = async () => {
+        if (this.state.isEffects) {
+            if (this.state.isMusic) {
+                this.state.music.currentTime = 0;
+                this.state.music.pause();
+            }
+            await this.state.gameOverSoundEffect.play();
         }
-        break;
-      case 40: //down arrow
-      case 83: //s - key
-        if (this.state.movementDirection !== "u") {
-          this.setState({ movementDirection: "d" });
+    };
+
+    handleGameStartMusic = () => {
+        if (this.state.isMusic) this.state.music.play();
+    };
+
+    foodEatSound = async () => {
+        if (this.state.isEffects) {
+            await this.state.foodEatSoundEffect.play();
         }
-        break;
-      case 37: //left arrow
-      case 65: //a - key
-        if (this.state.movementDirection !== "r") {
-          this.setState({ movementDirection: "l" });
-        }
-        break;
-      case 39: //right arrow
-      case 68: //d - key
-        if (this.state.movementDirection !== "l") {
-          this.setState({ movementDirection: "r" });
-        }
-        break;
-      default:
-        break;
+    };
+
+    render() {
+        const { snakeColor, foodColor, gameAreaColor, gameSpeed } = this.state;
+        return (
+            <div className="container">
+                <div className="row mt-3 ">
+                    <div className="col-2">
+                        <Settings
+                            music={this.state.isMusic}
+                            effects={this.state.isEffects}
+                            display={this.state.display}
+                            snakeColor={this.state.snakeColor}
+                            foodColor={this.state.foodColor}
+                            gameAreaColor={this.state.gameAreaColor}
+                            changeSnakeColor={this.changeSnakeColor}
+                            changeFoodColor={this.changeFoodColor}
+                            changeGameAreaColor={this.changeGameAreaColor}
+                            changeGameSpeed={this.changeGameSpeed}
+                            changeMusicVolume={this.changeMusicVolume}
+                            changeEffectsVolume={this.changeEffectsVolume}
+                            handleEffect={this.handleEffect}
+                            handleMusic={this.handleMusic}
+                        />
+                    </div>
+                    <div className="col-8 mr-5">
+                        <GameArea
+                            foodEatSound={this.foodEatSound}
+                            gameOverSound={this.gameOverSound}
+                            handleGameStartMusic={this.handleGameStartMusic}
+                            pause={this.state.display}
+                            snakeColor={snakeColor}
+                            foodColor={foodColor}
+                            gameAreaColor={gameAreaColor}
+                            gameSpeed={gameSpeed}
+                            handleOptionClick={this.handleOptionClick}
+                        />
+                    </div>
+                    <div className="col">
+                        <Statistics/>
+                    </div>
+                </div>
+            </div>
+        );
     }
-  };
-
-  moveSnake = () => {
-    let dots = [...this.state.snakeBody];
-    let head = dots[dots.length - 1];
-    switch (this.state.movementDirection) {
-      case "r":
-        head = [head[0] + 2, head[1]];
-        break;
-      case "u":
-        head = [head[0], head[1] - 2];
-        break;
-      case "l":
-        head = [head[0] - 2, head[1]];
-        break;
-      case "d":
-        head = [head[0], head[1] + 2];
-        break;
-      default:
-        break;
-    }
-    dots.push(head);
-    dots.shift();
-    this.setState({
-      snakeBody: dots,
-    });
-  };
-
-  checkIfOutOfBorders() {
-    let head = this.state.snakeBody[this.state.snakeBody.length - 1];
-    if (head[0] >= 100 || head[1] >= 100 || head[0] < 0 || head[1] < 0) {
-      this.onGameOver();
-    }
-  }
-
-  checkIfCollapsed() {
-    let snake = [...this.state.snakeBody];
-    let head = snake[snake.length - 1];
-    snake.pop();
-    snake.forEach((dot) => {
-      if (head[0] === dot[0] && head[1] === dot[1]) {
-        this.onGameOver();
-      }
-    });
-  }
-
-  onGameOver() {
-    this.props.gameOverSound();
-    clearInterval(this.state.interval);
-    this.setState({ gameOver: true });
-  }
-
-  startGame() {
-    const { highScore } = this.state;
-    this.setState(initialState);
-    this.setState({ highScore });
-    const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-    this.setState({ interval });
-    this.props.handleGameStartMusic();
-  }
-
-  pauseClicked() {
-    if (!this.state.pause) {
-      clearInterval(this.state.interval);
-    } else {
-      let interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-      this.setState({ interval });
-    }
-    this.setState({ pause: !this.state.pause });
-  }
-
-  checkIfEatenSnakeFood() {
-    let head = this.state.snakeBody[this.state.snakeBody.length - 1];
-    const { snakeFood } = this.state;
-    if (head[0] === snakeFood[0] && head[1] === snakeFood[1]) {
-      this.props.foodEatSound();
-      this.setState({ snakeFood: getRandXY() });
-      this.manipulateScore();
-      this.enlargeSnake();
-      this.increaseSnakeSpeed();
-      clearInterval(this.state.interval);
-      const interval = setInterval(this.moveSnake, this.state.snakeSpeed);
-      this.setState({ interval });
-    }
-  }
-
-  manipulateScore() {
-    let { score, highScore } = this.state;
-    score += 1;
-    if (score > highScore) {
-      highScore = score;
-    }
-    this.setState({ score, highScore });
-  }
-
-  enlargeSnake() {
-    const snake = [...this.state.snakeBody];
-    snake.unshift([]);
-    this.setState({ snakeBody: snake });
-  }
-
-  increaseSnakeSpeed() {
-    const { snakeSpeed } = this.state;
-    if (snakeSpeed > 50 && this.props.gameSpeed === "default") {
-      this.setState({ snakeSpeed: snakeSpeed - 10 });
-    }
-  }
-
-  render() {
-    const { snakeColor, foodColor, gameAreaColor } = this.props;
-    return (
-      <div>
-        <div className="game-area" style={{ backgroundColor: gameAreaColor }}>
-          <Food dot={this.state.snakeFood} foodColor={foodColor} />
-          <Snake snakeBody={this.state.snakeBody} snakeColor={snakeColor} />
-          {this.state.pause ? <Pause /> : null}
-          {this.state.gameOver ? <GameOver score={this.state.score} /> : null}
-        </div>
-        <div className="score-area">
-          <h1 className="score">High score: {this.state.highScore}</h1>
-          <h1 className="score">Your score: {this.state.score}</h1>
-        </div>
-      </div>
-    );
-  }
 }
 
-export default Game;
+export default Game
