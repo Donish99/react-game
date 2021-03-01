@@ -5,10 +5,10 @@ import 'bootstrap/dist/css/bootstrap.css'
 
 const App = () => {
   return (
-      <>
+      <div style={{height: "100vh", border: "2px solid red"}}>
         <Game />
         <Footer />
-      </>
+      </div>
     )
 }
 
