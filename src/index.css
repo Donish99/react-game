@@ -64,6 +64,6 @@
   bottom: 0;
 }
 
-label {
-  justify-self: flex-end;
+a {
+  margin: 5px;
 }
