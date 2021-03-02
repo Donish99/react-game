@@ -13,7 +13,7 @@ const getRandXY = () => {
 
 const initialState = {
   score: 0,
-  highScore: localStorage.getItem('highestScore') || 0,
+  highScore: localStorage.getItem("highestScore") || 0,
   gameOver: false,
   pause: false,
   interval: undefined,
@@ -32,6 +32,7 @@ const initialState = {
 };
 
 class GameArea extends Component {
+  // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);
   }
@@ -168,8 +169,11 @@ class GameArea extends Component {
   }
 
   handleStorage() {
-    localStorage.setItem('scoreBoard', localStorage.getItem('scoreBoard') + "," + this.state.score);
-    localStorage.setItem('highestScore', this.state.highScore);
+    localStorage.setItem(
+      "scoreBoard",
+      localStorage.getItem("scoreBoard") + "," + this.state.score
+    );
+    localStorage.setItem("highestScore", this.state.highScore);
   }
 
   pauseClicked() {
@@ -230,8 +234,8 @@ class GameArea extends Component {
           {this.state.gameOver ? <GameOver score={this.state.score} /> : null}
         </div>
         <div className="score-area">
-          <h1 className="score">High score: {this.state.highScore}</h1>
-          <h1 className="score">Your score: {this.state.score}</h1>
+          <h4 className="score">High score: {this.state.highScore}</h4>
+          <h4 className="score">Your score: {this.state.score}</h4>
         </div>
       </div>
     );
